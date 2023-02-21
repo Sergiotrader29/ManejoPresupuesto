@@ -8,6 +8,8 @@ namespace ManejoPresupuesto.Servicios
     {
         Task Crear(TipoCuentas tipoCuentas);
         Task<bool> Existe(string nombre, int usuarioId);
+        Task<IEnumerable<TipoCuentas>> Obtener(int usuarioId);
+        //Task<TipoCuentas> ObtenerPorId(int id, int usuarioId);
     }
     public class RepositoriosTiposCuentas: IrepositoriosTipoCuentas
     {
@@ -39,5 +41,15 @@ namespace ManejoPresupuesto.Servicios
             return existe == 1;
         }
 
+        public async Task<IEnumerable<TipoCuentas>> Obtener(int usuarioId)
+        {
+            using var connection = new SqlConnection(ConnectionString);
+            return await connection.QueryAsync<TipoCuentas>(@"SELECT Id, Nombre, Orden
+                                                            FROM TiposCuentas
+                                                            WHERE UsuarioId = @UsuarioId
+                                                            ORDER BY Orden", new { usuarioId });
+        }
+
+       
     }
 }

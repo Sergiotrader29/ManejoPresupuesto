@@ -7,12 +7,21 @@ namespace ManejoPresupuesto.Controllers
     public class TiposCuentasController: Controller // Ctrl . para importar AspNetcore
     {
         private readonly IrepositoriosTipoCuentas repositoriosTipoCuentas;
+        private readonly IserviciosUsuarios serviciosUsuarios;
 
-        public TiposCuentasController(IrepositoriosTipoCuentas repositoriosTipoCuentas)
+        public TiposCuentasController(IrepositoriosTipoCuentas repositoriosTipoCuentas,
+            IserviciosUsuarios serviciosUsuarios)
         {
             this.repositoriosTipoCuentas = repositoriosTipoCuentas;
+            this.serviciosUsuarios = serviciosUsuarios;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            var usuarioId = serviciosUsuarios.ObtenerUsuarioId();
+            var tipoCuentas = await repositoriosTipoCuentas.Obtener(usuarioId);
+            return View(tipoCuentas);
+        }
         public IActionResult Crear()
         {
             return View();
@@ -26,7 +35,7 @@ namespace ManejoPresupuesto.Controllers
                 return View(tipoCuentas); //Que retorne de nuevo, y que no borre los datos
             }
 
-            tipoCuentas.UsuarioId = 1;
+            tipoCuentas.UsuarioId = serviciosUsuarios.ObtenerUsuarioId();
 
             var yaExisteTipoCuenta = await repositoriosTipoCuentas.Existe(tipoCuentas.Nombre, tipoCuentas.UsuarioId);
 
@@ -36,16 +45,15 @@ namespace ManejoPresupuesto.Controllers
                 return View(tipoCuentas);
             }
 
-           
+
             await repositoriosTipoCuentas.Crear(tipoCuentas);
 
-            return View();
+            return RedirectToAction("Index");
         }
-
-        [HttpGet]
+            [HttpGet]
         public async Task<IActionResult> VerificarExisteTipoCuenta(string nombre)
         {
-            var usuarioId = 1;
+            var usuarioId = serviciosUsuarios.ObtenerUsuarioId();
             var yaExisteTipoCuenta = await repositoriosTipoCuentas.Existe(nombre, usuarioId);
 
             if (yaExisteTipoCuenta)
@@ -55,5 +63,7 @@ namespace ManejoPresupuesto.Controllers
 
             return Json(true);
         }
+
+
     }
 }

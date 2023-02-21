@@ -5,7 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 //transient porque nuestro reporsiotio no va compatir datos.
 builder.Services.AddTransient<IrepositoriosTipoCuentas, RepositoriosTiposCuentas>();// Se configuro el servicio
+builder.Services.AddTransient<IserviciosUsuarios, ServicioUsuarios>();// Se configuro el servicio
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
